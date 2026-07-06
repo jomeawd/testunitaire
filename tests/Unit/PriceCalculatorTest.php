@@ -8,111 +8,82 @@ use PHPUnit\Framework\TestCase;
 
 class PriceCalculatorTest extends TestCase
 {
-    /**
-     * Vérifie le calcul pour un seul article.
-     */
-    public function test_price_of_one_item(): void
+    public function test_one_item_in_ut()
     {
         $this->assertEquals(
-            10,
-            PriceCalculator::calculate(10, 1)
+            10.69,
+            PriceCalculator::calculate(10, 1, 'UT')
         );
     }
 
-    /**
-     * Vérifie le calcul pour plusieurs articles.
-     */
-    public function test_price_of_five_items(): void
+    public function test_one_item_in_ca()
     {
         $this->assertEquals(
-            50,
-            PriceCalculator::calculate(10, 5)
+            10.83,
+            PriceCalculator::calculate(10, 1, 'CA')
         );
     }
 
-    /**
-     * Vérifie le calcul avec un prix unitaire décimal.
-     */
-    public function test_price_with_decimal_unit_price(): void
+    public function test_one_item_in_tx()
     {
         $this->assertEquals(
-            37.5,
-            PriceCalculator::calculate(7.5, 5)
+            10.63,
+            PriceCalculator::calculate(10, 1, 'TX')
         );
     }
 
-    /**
-     * Vérifie le calcul lorsque la quantité est nulle.
-     */
-    public function test_zero_quantity(): void
+    public function test_zero_quantity()
     {
         $this->assertEquals(
             0,
-            PriceCalculator::calculate(10, 0)
+            PriceCalculator::calculate(10, 0, 'CA')
         );
     }
 
-    /**
-     * Un prix unitaire à zéro donne un total nul.
-     */
-    public function test_zero_unit_price(): void
+    public function test_discount_three_percent()
     {
         $this->assertEquals(
-            0,
-            PriceCalculator::calculate(0, 5)
+            1050.03,
+            PriceCalculator::calculate(100, 10, 'CA')
         );
     }
 
-    /**
-     * Vérifie le calcul avec une grande quantité.
-     */
-    public function test_large_quantity(): void
+    public function test_discount_five_percent()
     {
         $this->assertEquals(
-            2000,
-            PriceCalculator::calculate(2, 1000)
+            5046.88,
+            PriceCalculator::calculate(500, 10, 'TX')
         );
     }
 
-    /**
-     * Vérifie un calcul dont le résultat est décimal.
-     */
-    public function test_decimal_price_and_result(): void
+    public function test_discount_seven_percent()
     {
         $this->assertEquals(
-            59.97,
-            PriceCalculator::calculate(19.99, 3)
+            6770.40,
+            PriceCalculator::calculate(700, 10, 'AL')
         );
     }
 
-    /**
-     * Un prix et une quantité nuls donnent zéro.
-     */
-    public function test_zero_price_and_zero_quantity(): void
+    public function test_discount_ten_percent()
     {
         $this->assertEquals(
-            0,
-            PriceCalculator::calculate(0, 0)
+            9720.00,
+            PriceCalculator::calculate(1000, 10, 'NV')
         );
     }
 
-    /**
-     * Une quantité négative doit être refusée.
-     */
-    public function test_negative_quantity_throws_exception(): void
+    public function test_discount_fifteen_percent()
+    {
+        $this->assertEquals(
+            46006.25,
+            PriceCalculator::calculate(5000, 10, 'CA')
+        );
+    }
+
+    public function test_invalid_state()
     {
         $this->expectException(InvalidArgumentException::class);
 
-        PriceCalculator::calculate(10, -2);
-    }
-
-    /**
-     * Un prix unitaire négatif doit être refusé.
-     */
-    public function test_negative_unit_price_throws_exception(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        PriceCalculator::calculate(-5, 2);
+        PriceCalculator::calculate(100, 10, 'FR');
     }
 }

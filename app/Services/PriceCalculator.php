@@ -6,25 +6,47 @@ use InvalidArgumentException;
 
 class PriceCalculator
 {
-    /**
-     * Calcule le prix brut d'une commande.
-     *
-     * @param float $unitPrice Prix unitaire
-     * @param int $quantity Nombre d'articles
-     * @return float Prix total
-     *
-     * @throws InvalidArgumentException Si le prix ou la quantité est négatif.
-     */
-    public static function calculate(float $unitPrice, int $quantity): float
+    private const TAXES = [
+        'UT' => 0.0685,
+        'NV' => 0.08,
+        'TX' => 0.0625,
+        'AL' => 0.04,
+        'CA' => 0.0825,
+    ];
+
+    public static function calculate(float $unitPrice, int $quantity, string $state): float
     {
-        if ($unitPrice < 0) {
-            throw new InvalidArgumentException('Le prix unitaire ne peut pas être négatif.');
+        if ($quantity <= 0) {
+            return 0;
         }
 
-        if ($quantity < 0) {
-            throw new InvalidArgumentException('La quantité ne peut pas être négative.');
+        if (!array_key_exists($state, self::TAXES)) {
+            throw new InvalidArgumentException("Etat inconnu");
         }
 
-        return $unitPrice * $quantity;
+        // Prix HT
+        $total = $unitPrice * $quantity;
+
+        // Réduction avant TVA
+        $discount = 0;
+
+        if ($total >= 50000) {
+            $discount = 0.15;
+        } elseif ($total >= 10000) {
+            $discount = 0.10;
+        } elseif ($total >= 7000) {
+            $discount = 0.07;
+        } elseif ($total >= 5000) {
+            $discount = 0.05;
+        } elseif ($total >= 1000) {
+            $discount = 0.03;
+        }
+
+        $total = $total * (1 - $discount);
+
+        // Application de la TVA
+        $total = $total * (1 + self::TAXES[$state]);
+
+        return round($total, 2);
     }
 }
